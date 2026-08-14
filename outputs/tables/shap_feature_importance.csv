@@ -1,0 +1,12 @@
+Feature,Mean_Abs_SHAP,Pct_Importance
+VPD_x_Reduction,9.276982,32.80496
+Temperature_C,8.169935,28.890259
+Relative_Stomatal_Reduction_Pct,5.025712,17.771759
+PPFD_umol,4.721664,16.696592
+PPFD_x_Reduction,0.82797766,2.9278674
+Reduction_Squared,0.2569336,0.9085602
+CO2_ppm,0.0,0.0
+VPD_kPa,0.0,0.0
+Is_Drought,0.0,0.0
+Study_Karavolias2023,0.0,0.0
+Study_Karavolias2024,0.0,0.0

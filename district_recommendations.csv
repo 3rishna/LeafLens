@@ -1,0 +1,11 @@
+District,Season,Mean_Temp_C,Mean_VPD_kPa,Optimal_Reduction_Pct,Predicted_Intrinsic_WUE,WUE_95CI_Lower,WUE_95CI_Upper
+Warangal,Kharif,26.5,0.86,20,142.0,125.0,169.02
+Warangal,Pre_Monsoon,32.5,3.09,45,95.82,78.36,113.21
+Nizamabad,Kharif,26.0,0.87,20,141.27,124.27,168.29
+Nizamabad,Pre_Monsoon,32.3,3.36,40,92.58,75.12,109.97
+Karimnagar,Kharif,26.7,0.86,20,141.51,124.52,168.54
+Karimnagar,Pre_Monsoon,33.2,3.39,40,92.2,74.74,109.59
+Nalgonda,Kharif,27.4,1.0,20,134.09,116.61,160.43
+Nalgonda,Pre_Monsoon,32.5,2.81,45,100.78,83.32,118.17
+Khammam,Kharif,26.9,0.83,20,144.08,127.08,171.11
+Khammam,Pre_Monsoon,32.4,2.74,50,100.89,83.43,118.28

@@ -1,0 +1,5 @@
+Variable,Bio_Train_Min,Bio_Train_Max,Telangana_5th_Pct,Telangana_95th_Pct,Domain_Status
+Temperature (C),28.0,31.0,20.51,35.32,FLAG: Partial Extrapolation
+CO2 Concentration (ppm),400.0,450.0,420.0,420.0,PASS: Interpolation (Within Domain)
+PPFD Light (umol m-2 s-1),1000.0,1500.0,32.24,82.62,FLAG: Partial Extrapolation
+VPD (kPa),1.32,2.25,0.37,3.91,FLAG: Partial Extrapolation

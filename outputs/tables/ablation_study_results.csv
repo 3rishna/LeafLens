@@ -1,0 +1,6 @@
+Model_Variant,Num_Features,Mean_5Fold_R2,R2_Std_Dev,R2_Drop_Vs_Full
+Full Physics-Informed Model,11,0.247,0.071,0.0
+Ablation A (Drop VPD Features),9,0.25,0.073,-0.003
+Ablation B (Drop Interaction Terms),8,0.248,0.086,-0.001
+Ablation C (Drop Study Dummies),9,0.247,0.071,-0.0
+Ablation D (Naive ML - No Physics),5,0.248,0.086,-0.001
