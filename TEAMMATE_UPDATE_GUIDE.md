@@ -2,7 +2,7 @@
 
 > **For:** Teammate / Collaborator (Using Antigravity AI)  
 > **Project:** Physics-Informed Machine Learning to Optimize CRISPR Stomatal Engineering for Climate-Resilient Rice in Telangana  
-> **Conference:** JNTUH / ICAIBTS 2026 (Track 3: AI for Sustainable Agriculture)  
+> **Department:** Department of Computer Science & Engineering, JNTUH  
 > **Target Output:** Complete Decoupled FastAPI Python Backend + Vite React Tailwind Frontend System with Interactive Lightbox Modals, Research Paper Links, and Physics-Informed ML Engine.
 
 ---

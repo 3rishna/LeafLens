@@ -1,6 +1,6 @@
 # 🌾 Physics-Informed Machine Learning to Optimize CRISPR Stomatal Engineering for Climate-Resilient Rice in Telangana
 
-> **ICAIBTS 2026 Research Project**  
+> **Physics-Informed ML & Agricultural Biotechnology Platform**  
 > **Authors / Collaborators:** Department of Computer Science & Engineering, JNTUH & Research Team  
 > **Domain:** Biophysics + Physics-Informed ML + Agricultural Biotechnology + Climate Adaptation
 

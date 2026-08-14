@@ -211,7 +211,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="mt-12 pt-6 border-t border-agri-border text-center text-xs text-agri-textMuted font-medium">
-        CRISPR Rice Engineering System | Department of Computer Science & Engineering, JNTUH | ICAIBTS 2026
+        CRISPR Rice Engineering System | Department of Computer Science & Engineering, JNTUH
       </footer>
     </div>
   );
