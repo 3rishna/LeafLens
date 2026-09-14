@@ -1,0 +1,50 @@
+{
+  "A": {
+    "physics_params": {
+      "ymax": 20.505204693825075,
+      "km": 198.16500313915338,
+      "beta": 0.04588694053778243
+    },
+    "ridge_coef": {
+      "SD_ratio": 2.709468843371941,
+      "PPFD_umol": -0.001178913009057512,
+      "VPD_kPa": -2.5065739576107053,
+      "Is_Drought": 1.6819276020762124,
+      "Temperature_C": -2.1657490221173066,
+      "CO2_ppm": 0.36482495668555964
+    },
+    "ridge_intercept": -85.48998541886617,
+    "features": [
+      "SD_ratio",
+      "PPFD_umol",
+      "VPD_kPa",
+      "Is_Drought",
+      "Temperature_C",
+      "CO2_ppm"
+    ]
+  },
+  "gs": {
+    "physics_params": {
+      "ymax": 0.2910084951508034,
+      "km": 167.10053744954195,
+      "beta": 0.12957526658155158
+    },
+    "ridge_coef": {
+      "SD_ratio": 0.046587371285741516,
+      "PPFD_umol": -1.9660319613204512e-05,
+      "VPD_kPa": -0.04224740548591948,
+      "Is_Drought": 0.022976708898953438,
+      "Temperature_C": -0.041897811990381825,
+      "CO2_ppm": 0.006480950591114583
+    },
+    "ridge_intercept": -1.4187757858246428,
+    "features": [
+      "SD_ratio",
+      "PPFD_umol",
+      "VPD_kPa",
+      "Is_Drought",
+      "Temperature_C",
+      "CO2_ppm"
+    ]
+  }
+}

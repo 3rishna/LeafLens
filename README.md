@@ -1,92 +1,126 @@
-# 🌾 Physics-Informed Machine Learning to Optimize CRISPR Stomatal Engineering for Climate-Resilient Rice in Telangana
+# LeafLens — Physics-Informed ML for CRISPR Stomatal Engineering in Rice
 
-> **Physics-Informed ML & Agricultural Biotechnology Platform**  
-> **Authors / Collaborators:** Department of Computer Science & Engineering, JNTUH & Research Team  
-> **Domain:** Biophysics + Physics-Informed ML + Agricultural Biotechnology + Climate Adaptation
+A physics-informed machine-learning framework that predicts leaf gas exchange
+(carbon assimilation $A$ and stomatal conductance $g_s$) in CRISPR stomatal-engineered
+rice, built on a harmonized 165-measurement dataset compiled from three published
+studies and validated with genotype-grouped cross-validation.
 
----
-
-## 📌 Abstract & Overview
-
-Rising atmospheric temperatures and extreme Vapor Pressure Deficit (VPD) events in Telangana (Warangal, Nizamabad, Karimnagar, Nalgonda, Khammam) cause severe transpirational water stress and yield penalty in *Oryza sativa* (rice). While CRISPR-Cas9 genome editing targeting promoter regions of stomatal development genes (*OsEPF1*, *OsEPFL9/10*, *OsSTOMAGEN*) allows precise reduction of stomatal density ($N_s$), non-linear trade-offs between water-use efficiency (WUE) and photosynthetic carbon assimilation ($A$) vary dramatically under regional micro-climates.
-
-This system combines a **Medlyn biophysical stomatal conductance model ($g_s$)** with a **Physics-Informed XGBoost Machine Learning architecture** trained on 168 digitized experimental measurements from peer-reviewed literature (Caine et al. 2019, Karavolias et al. 2023, Karavolias et al. 2024) and 11 years of NASA POWER daily climate data (2015–2026).
+**Authors:** P. Thrishna Sai, N. Jenika — Centre for Biotechnology, JNTUH-UCESTH, Hyderabad
 
 ---
 
-## 🚀 Key Features
+## What this project does
 
-1. **Decoupled Architecture**:
-   - **FastAPI Python Backend**: REST endpoints & Real-time Server-Sent Events (SSE) streaming predictions.
-   - **Vite React Tailwind Frontend**: Modern agricultural technology user portal with Framer Motion animations, Recharts, Plotly 3D rotatable surfaces, and SHAP explainability.
-2. **Physics-Informed Hybrid ML Model**:
-   - Outperforms pure physical Medlyn baselines ($R^2 = +0.183$ vs $R^2 = -0.266$, $+44.9$ percentage point gain).
-   - 5-Fold Cross Validation ($0.174 \pm 0.078$).
-3. **Interactive Visual Cards & Source Research Papers**:
-   - Clickable lightbox views of authentic *Oryza sativa* SEM 1000x leaf microscopy and Telangana paddy field cultivation.
-   - Direct DOI links to foundational literature.
+CRISPR editing of stomatal-patterning genes (`OsEPF1`, `OsEPFL10`, `OsSTOMAGEN`) can
+reduce the density of stomatal pores on a rice leaf, cutting water loss. The design
+question is *how much* reduction is appropriate: fewer pores save water but also
+restrict the CO₂ supply that drives photosynthesis.
+
+LeafLens models that trade-off. It combines a **light-response saturation prior** from
+photosynthesis physiology with a **ridge-regression residual learner**:
+
+```
+y = y_max · PPFD/(PPFD + K_m) · S^β   +   f_ridge(S, PPFD, VPD, drought, T, CO₂)
+        └────────── physics prior ──────────┘   └──────── learned residual ────────┘
+```
+
+where `S` is stomatal density relative to wild type.
+
+### Headline results (genotype-grouped CV, 20 randomized fold assignments)
+
+| Target | R² | Variance ceiling | % of achievable |
+|---|---|---|---|
+| Assimilation `A` | **0.531 ± 0.166** | 0.830 | 64% |
+| Conductance `g_s` | **0.362 ± 0.152** | 0.501 | 72% |
+
+The physics prior earns its place: it improves R² by **+0.116 ± 0.091** (`A`) and
+**+0.042 ± 0.023** (`g_s`) over an otherwise identical model without it, winning in
+**20 of 20** paired repeats for both targets.
+
+Within the validated domain, a **30% stomatal-density reduction** is predicted to retain
+**94.9%** of wild-type assimilation while reducing conductance to **92.0%** — water loss
+falls faster than carbon gain, which is the quantitative basis for stomatal engineering.
 
 ---
 
-## 🛠️ Installation & Setup
+## Three findings that constrain how far this can be pushed
 
-### Prerequisites
-- Python 3.9+
-- Node.js 18+ and npm
+These are reported as prominently as the performance numbers, because they bound it.
 
-### 1. Backend Setup
+1. **Intrinsic water-use efficiency (`A/g_s`) is not a learnable target here.** An ANOVA
+   intraclass-correlation analysis gives it an R² ceiling of **0.00** — its replicate
+   noise is 2.7× its genotype effect. Modelling `A` and `g_s` separately works; modelling
+   their ratio cannot. We recommend running this diagnostic *before* modelling any
+   derived/ratio target.
+
+2. **Cross-study transfer is not demonstrated.** Leave-one-study-out R² is strongly
+   negative, and normalizing to within-study wild-type controls does **not** repair it
+   (−0.28 for `A`, −0.04 for `g_s`). With three studies these estimates are unstable
+   enough that no signed value should be trusted.
+
+3. **The decision-relevant range is nearly unmeasured.** Across the whole published
+   literature, stomatal-reduction levels jump from 28.5% to 58.0% — a 29.5-point gap —
+   and the entire 30–70% band rests on a **single genotype** (5 of 165 measurements).
+   Predictive reliability also declines with reduction severity (Spearman ρ = −0.50 for
+   `A`, −0.58 for `g_s`).
+
+---
+
+## Repository layout
+
+```
+scripts/
+  parse_digitized_data.py     # build bio_master.csv from digitized figure data
+  build_feautures.py          # feature engineering + climate PPFD conversion
+  train_final_model.py        # FINAL model: physics prior + ridge, all validation
+  run_supporting_analyses.py  # reproduces every remaining number in the paper
+  make_final_figures.py       # all manuscript figures
+  run_eda.py                  # exploratory plots + extrapolation diagnostic
+  download_climate.py         # NASA POWER retrieval
+  train_models.py             # legacy iWUE-target pipeline (superseded; see paper §4.7)
+  optimize_sweep.py, run_shap.py, run_ablation.py   # legacy analyses
+data/
+  biological/raw/             # WebPlotDigitizer exports from source figures
+  processed/training_data.csv # final 165-row feature matrix
+  climate/                    # NASA POWER daily records, 5 Telangana districts
+outputs/tables/               # all result tables (CSV/JSON)
+outputs/figures/              # all generated figures
+paper/
+  main.tex                    # manuscript (Springer Nature sn-jnl class)
+  main_llncs_render.tex       # locally-compilable rendering (identical content)
+  LeafLens_paper.pdf          # compiled PDF
+papers/                       # source publications (PDFs)
+PROJECT_NOTES.md              # full methodology, corrections log, and rationale
+```
+
+## Reproducing
+
 ```bash
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/crispr-rice-engineering.git
-cd crispr-rice-engineering
-
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start FastAPI server
-uvicorn backend.main:app --port 8000 --reload
+python scripts/parse_digitized_data.py      # rebuild dataset from digitized figures
+python scripts/build_feautures.py           # feature matrix + climate conversion
+python scripts/train_final_model.py         # model, validation, ceiling analysis
+python scripts/run_supporting_analyses.py   # leakage, transfer, coverage analyses
+python scripts/make_final_figures.py        # figures
 ```
 
-### 2. Frontend Setup
-```bash
-# Install dependencies
-cd frontend
-npm install
+Every quantitative claim in the manuscript is produced by one of these scripts and
+written to `outputs/tables/`.
 
-# Start development server
-npm run dev
-```
+## Data provenance
 
-Open `http://localhost:5173` in your browser.
+All gas-exchange values are digitized from published figures using WebPlotDigitizer, or
+taken from values stated numerically in the source text. Each row carries an `A_Source`
+flag: `digitized`, `digitized_genotype_mean`, or `estimated_regression` (59 rows where the
+source study reported conductance but not paired assimilation under drought; estimated via
+a regression fitted on that study's own steady-state data, R²=0.931).
 
----
+Sources: Caine et al. 2019 (New Phytologist, [10.1111/nph.15344](https://doi.org/10.1111/nph.15344)) ·
+Karavolias et al. 2023 (Plant Physiology, [10.1093/plphys/kiad183](https://doi.org/10.1093/plphys/kiad183)) ·
+Karavolias et al. 2024 (Plant Biotechnology Journal, [10.1111/pbi.14464](https://doi.org/10.1111/pbi.14464)) ·
+climate from [NASA POWER](https://power.larc.nasa.gov/).
 
-## 📊 Repository Structure
+## Status
 
-```text
-paddy_project/
-├── backend/                # FastAPI backend application
-│   ├── routes/             # REST & SSE streaming endpoints
-│   ├── services/           # Model inference & biophysical calculation logic
-│   └── main.py             # FastAPI entry point
-├── frontend/               # Vite + React + Tailwind frontend application
-│   ├── src/                # React components (ControlPanel, MetricCards, etc.)
-│   └── public/figures/     # Authentic rice plant & microscopy images
-├── data/                   # Master biological & NASA climate datasets
-├── scripts/                # Data pipeline & model training scripts
-├── outputs/                # Saved model artifacts & figure exports
-├── README.md               # GitHub project overview & documentation
-└── requirements.txt        # Python dependency requirements
-```
-
----
-
-## 📜 Citation & References
-
-- **Caine et al. (2019)** – *Rice plants with reduced stomatal density exhibit improved water-use efficiency and drought tolerance*. New Phytologist. DOI: [10.1111/nph.15344](https://doi.org/10.1111/nph.15344)
-- **Karavolias et al. (2023)** – *Paralogous OsEPFL genes modulate stomatal density in rice*. Plant Physiology. DOI: [10.1093/plphys/kiad183](https://doi.org/10.1093/plphys/kiad183)
-- **Karavolias et al. (2024)** – *Promoter editing of OsSTOMAGEN tunes stomatal density and yield traits in rice*. Plant Biotechnology Journal. DOI: [10.1111/pbi.14464](https://doi.org/10.1111/pbi.14464)
+This is a research prototype and a methods contribution, not a deployment-ready trait-design
+tool. See `PROJECT_NOTES.md` for the full correction history and the reasoning behind each
+modelling decision.

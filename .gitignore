@@ -30,3 +30,9 @@ Thumbs.db
 
 # Streamlit Local Cache
 .streamlit/
+
+# Build artifacts
+leaflens_paper.zip
+paper/*.aux
+paper/*.log
+paper/*.out

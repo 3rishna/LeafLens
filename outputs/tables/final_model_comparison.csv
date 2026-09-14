@@ -1,0 +1,11 @@
+Target,Model,Grouped_CV_R2,Grouped_CV_SD,Variance_Ceiling_R2,Pct_Of_Achievable
+A,Pure physics law (no ML),-0.86,1.99,0.83,-103.6
+A,"Naive ML (Ridge, no physics)",0.415,0.235,0.83,50.0
+A,"Naive ML (XGBoost, no physics)",-0.06,1.213,0.83,-7.3
+A,Physics-informed hybrid (XGB resid),0.004,1.41,0.83,0.4
+A,Physics-informed hybrid (Ridge resid),0.531,0.166,0.83,64.0
+gs,Pure physics law (no ML),-0.517,0.809,0.501,-103.2
+gs,"Naive ML (Ridge, no physics)",0.32,0.161,0.501,63.9
+gs,"Naive ML (XGBoost, no physics)",-0.335,0.664,0.501,-67.0
+gs,Physics-informed hybrid (XGB resid),-0.204,0.648,0.501,-40.8
+gs,Physics-informed hybrid (Ridge resid),0.362,0.152,0.501,72.3

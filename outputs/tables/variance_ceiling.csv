@@ -1,0 +1,4 @@
+Variable,Ceiling_R2,Irreducible_Noise_Frac
+A (assimilation),0.83,0.17
+gs (conductance),0.501,0.499
+iWUE = A/gs (original target),0.0,1.0

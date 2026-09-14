@@ -1,0 +1,116 @@
+{
+  "leakage": {
+    "iWUE (A/gs)": {
+      "shuffled_R2": -0.001,
+      "grouped_R2": -0.397,
+      "inflation": 0.396
+    },
+    "A": {
+      "shuffled_R2": 0.686,
+      "grouped_R2": 0.464,
+      "inflation": 0.222
+    },
+    "gs": {
+      "shuffled_R2": 0.491,
+      "grouped_R2": 0.314,
+      "inflation": 0.177
+    }
+  },
+  "iwue": {
+    "direct_R2": -0.397,
+    "direct_SD": 1.002,
+    "derived_R2": -0.363,
+    "derived_SD": 0.411
+  },
+  "relative_effect_size": {
+    "gs": {
+      "genotype_mean_min": 0.604,
+      "genotype_mean_max": 1.126,
+      "between_genotype_SD": 0.14,
+      "within_genotype_SD": 0.246,
+      "noise_to_signal": 1.76
+    },
+    "A": {
+      "genotype_mean_min": 0.737,
+      "genotype_mean_max": 1.084,
+      "between_genotype_SD": 0.095,
+      "within_genotype_SD": 0.119,
+      "noise_to_signal": 1.25
+    },
+    "iWUE": {
+      "genotype_mean_min": 0.957,
+      "genotype_mean_max": 1.285,
+      "between_genotype_SD": 0.087,
+      "within_genotype_SD": 0.238,
+      "noise_to_signal": 2.73
+    }
+  },
+  "wt_normalized_transfer": {
+    "A": {
+      "loso_mean_R2": -0.28,
+      "folds": [
+        0.324,
+        -0.964,
+        -0.2
+      ]
+    },
+    "gs": {
+      "loso_mean_R2": -0.037,
+      "folds": [
+        0.157,
+        -0.067,
+        -0.202
+      ]
+    },
+    "iWUE": {
+      "loso_mean_R2": 0.071,
+      "folds": [
+        -0.069,
+        0.244,
+        0.038
+      ]
+    }
+  },
+  "reliability_pattern": {
+    "A": {
+      "spearman_absreduction_vs_R2": -0.497,
+      "median_R2_severe_ge58pct": -0.544,
+      "median_R2_moderate_lt58pct": 0.39,
+      "median_R2_caine": -0.613,
+      "median_R2_other_studies": 0.278
+    },
+    "gs": {
+      "spearman_absreduction_vs_R2": -0.576,
+      "median_R2_severe_ge58pct": -2.242,
+      "median_R2_moderate_lt58pct": 0.22,
+      "median_R2_caine": -0.494,
+      "median_R2_other_studies": 0.218
+    }
+  },
+  "coverage": {
+    "levels": [
+      -18.0,
+      -4.5,
+      0.0,
+      4.7,
+      9.4,
+      12.4,
+      16.7,
+      28.5,
+      58.0,
+      78.6,
+      78.7,
+      88.0
+    ],
+    "largest_gap": [
+      28.5,
+      58.0,
+      29.5
+    ],
+    "rows_30_to_70pct": 5,
+    "genotypes_30_to_70pct": [
+      "OsEPF1oeW"
+    ]
+  },
+  "n_genotype_lines": 14
+}

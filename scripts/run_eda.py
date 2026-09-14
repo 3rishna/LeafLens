@@ -38,10 +38,10 @@ plt.close()
 
 # Fig B: Reduction % vs Instantaneous WUE
 fig, ax = plt.subplots(figsize=(8, 5))
-sns.scatterplot(data=bio, x='Relative_Stomatal_Reduction_Pct', y='WUE_instantaneous', hue='Paper_ID', style='Water_Treatment', s=80, ax=ax, palette='Set2')
-ax.set_title('Stomatal Reduction (%) vs Instantaneous Water Use Efficiency (A/E)')
+sns.scatterplot(data=bio, x='Relative_Stomatal_Reduction_Pct', y='WUE_intrinsic', hue='Paper_ID', style='Water_Treatment', s=80, ax=ax, palette='Set2')
+ax.set_title('Stomatal Reduction (%) vs Intrinsic Water Use Efficiency (A/gs)')
 ax.set_xlabel('Stomatal Reduction (%)')
-ax.set_ylabel('WUE (A/E)')
+ax.set_ylabel('WUE (A/gs)')
 plt.tight_layout()
 plt.savefig('outputs/figures/eda_reduction_vs_wue.png', dpi=300)
 plt.close()
