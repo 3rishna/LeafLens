@@ -1,15 +1,28 @@
 % ============================================================================
 % LeafLens -- Springer Nature journal format (sn-jnl.cls)
 %
-% COMPILATION NOTE: sn-jnl.cls is Springer's own class and is NOT on CTAN, so it
-% cannot be auto-fetched by any LaTeX engine. Before submitting, either open the
-% "Springer Nature" template in the Overleaf gallery and paste this file in as
-% main.tex, or download the class from Springer's LaTeX author-support page.
-% A standalone-compilable llncs rendering of identical content is kept at
-% paper/main_llncs_render.tex for local preview.
-% ============================================================================
-\documentclass[pdflatex,sn-basic]{sn-jnl}
+% COMPILATION NOTE: sn-jnl.cls is Springer's own class and is NOT on CTAN, so no LaTeX
+% engine can auto-fetch it. Obtain it by opening the "Springer Nature" template in the
+% Overleaf gallery and pasting this file in as main.tex, or by downloading the template
+% from Springer's LaTeX author-support page (v3.1 or later).
 %
+% This file HAS been test-compiled against sn-jnl and builds cleanly (21 pp, 0 errors).
+% Three things were required and are already applied below:
+%   1. \usepackage{manyfoot} -- the class calls \SetFootnoteHook and \DeclareNewFootnote
+%      in an \AtBeginDocument hook but does not itself load the package providing them.
+%   2. Comma-separated \keywords -- \and is llncs syntax and collides with the class's
+%      author-block tabular, producing a "Misplaced \crcr" error.
+%   3. A numbered bibliography option (sn-mathphys-num) -- sn-basic defaults natbib to
+%      author-year, which is incompatible with the manual numeric \thebibliography used
+%      here. Substitute whichever numbered style your target journal specifies
+%      (sn-nature also builds cleanly; sn-vancouver does not without a .bst).
+%
+% A standalone-compilable llncs rendering of identical content is kept at
+% paper/main_llncs_render.tex for local preview without the proprietary class.
+% ============================================================================
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+%
+\usepackage{manyfoot}   % sn-jnl calls \SetFootnoteHook without loading it
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath}
@@ -29,7 +42,7 @@
 %
 \abstract{CRISPR-Cas9 editing of stomatal-patterning genes can reduce stomatal density and cut transpirational water loss in rice, but choosing how much reduction is appropriate requires a quantitative model of the resulting carbon--water trade-off, and published stomatal-engineering datasets are small. We assembled a harmonized 165-measurement dataset from three published rice studies (Caine et al. 2019; Karavolias et al. 2023, 2024) spanning three cultivars, three gene targets and 14 genotype lines, and developed a physics-informed model that adds a ridge-regression residual to a light-response saturation prior, $y = y_{\max}\,\mathrm{PPFD}/(\mathrm{PPFD}+K_m)\cdot S^{\beta}$, where $S$ is stomatal density relative to wild type. Under genotype-grouped cross-validation repeated across 20 randomized fold assignments, the framework predicts carbon assimilation with $R^{2}=0.53\pm0.17$ and stomatal conductance with $R^{2}=0.36\pm0.15$. The physics prior provides a reproducible benefit over an otherwise identical model without it, improving $R^{2}$ by $+0.116\pm0.091$ for assimilation and $+0.042\pm0.023$ for conductance, and winning in 20 of 20 paired repeats for both targets. Nested cross-validation, which executes the entire model-selection procedure inside the validation loop, places the selection-corrected performance at $R^{2}=0.43$ and $0.17$ respectively, and a permutation test rejects the null at $p<0.001$ for both; measured digitization error (0.41\% of axis span) does not affect these results until roughly twenty-five times that level. We introduce a variance-decomposition diagnostic -- the one-way random-effects intraclass correlation, which correctly discounts singleton replicate cells rather than letting them appear trivially "perfectly explained" -- that establishes the maximum $R^{2}$ any genotype-level predictor can attain given replicate scatter, and use it to show that intrinsic water-use efficiency ($A/g_s$), the target adopted by most comparable analyses including our own earlier work, has a ceiling of $R^{2}=0.00$: after accounting for the design's replicate structure it carries no statistically distinguishable between-genotype signal, its replicate noise being 2.7$\times$ its genotype effect. Modelling $A$ and $g_s$ separately recovers a usable framework where the ratio does not. We report three constraints on deployment, each quantified. First, predictive skill is not uniform: leave-one-genotype-out $R^{2}$ correlates negatively with reduction magnitude (Spearman $\rho=-0.50$ for $A$, $-0.58$ for $g_s$), and the most severe genotypes are the worst predicted. Second, absolute values do not transfer across studies, and normalizing to a within-study wild-type control does not rescue transfer (leave-one-study-out $R^{2}=-0.28$ for $A$, $-0.04$ for $g_s$); with only three studies these estimates are themselves unstable. Third, the literature contains a 29.5-point gap in stomatal-density reduction between 28.5\% and 58\%, and the entire 30--70\% decision-relevant band is represented by a single genotype (5 measurements). Within its validated domain the model predicts that a 30\% reduction retains 94.9\% of wild-type assimilation while reducing conductance to 92.0\%.}
 
-\keywords{Physics-Informed Machine Learning \and CRISPR-Cas9 \and Stomatal Engineering \and Gas Exchange \and Cross-Validation \and \textit{Oryza sativa}}
+\keywords{Physics-Informed Machine Learning, CRISPR-Cas9, Stomatal Engineering, Gas Exchange, Cross-Validation, \textit{Oryza sativa}}
 
 \maketitle
 
@@ -158,6 +171,8 @@ Two threats to the headline estimates are addressed quantitatively rather than b
 % ============================================================
 \section{Results}\label{sec:results}
 
+We first establish which response variables are learnable at all, then report predictive performance and the evidence that it is not an artifact of validation design or model selection. We then give the biological consequence -- the carbon--water trade-off -- and close with the three constraints that bound how far it can be extrapolated.
+
 \subsection{Which Targets Are Learnable}\label{sec:whyceiling}
 
 Table~\ref{tab:ceiling} applies Eq.~\ref{eq:ceiling} to three candidate targets. Assimilation and conductance are largely learnable; their ratio is not. For intrinsic water-use efficiency the ICC is $0.000$: after correctly discounting singleton-cell replicates, there is no between-genotype variance left to distinguish from noise. The effect size makes the reason concrete: across genotypes, mean $A/g_s$ relative to wild type spans 0.96--1.29 (standard deviation 0.087), while the mean within-genotype replicate standard deviation is 0.238 -- the noise is 2.7$\times$ larger than the entire biological signal. A ratio of two independently noisy measurements compounds the noise of both.
@@ -255,6 +270,39 @@ Both half-saturation constants (198 and 167\,$\mu$mol\,m$^{-2}$\,s$^{-1}$) fall 
 \label{fig:lightresp}
 \end{figure}
 
+\subsection{Validation Design and Leakage}\label{sec:leakage}
+
+Validation design materially affects reported performance on data of this structure, and we quantify the effect directly. Holding model, target, features and fold count fixed and varying only whether folds respect genotype boundaries, shuffled 5-fold cross-validation inflates $R^{2}$ relative to genotype-grouped cross-validation by $+0.222$ for $A$ ($0.686$ versus $0.464$), $+0.177$ for $g_s$ ($0.491$ versus $0.314$) and $+0.396$ for $A/g_s$ ($-0.001$ versus $-0.397$), averaged over 20 randomized fold assignments (Table~\ref{tab:leakage}). With 14 genotype lines contributing 165 measurements, replicate rows are near-duplicates, so a shuffled split largely measures interpolation between replicates of a genotype the model has already seen rather than generalization to a new genotype. The inflation is largest for the ratio target, which has the least real signal to dilute it. All performance figures reported in this paper are genotype-grouped.
+
+\begin{table}[t]
+\caption{Leakage from shuffled cross-validation. Identical model, features and fold count; only the fold-assignment rule differs. Mean over 20 randomized assignments.}\label{tab:leakage}
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Target} & \textbf{Shuffled 5-fold $R^{2}$} & \textbf{Genotype-grouped $R^{2}$} & \textbf{Inflation} \\
+\midrule
+$A$ (assimilation) & $+0.686$ & $+0.464$ & $+0.222$ \\
+$g_s$ (conductance) & $+0.491$ & $+0.314$ & $+0.177$ \\
+$A/g_s$ (intrinsic WUE) & $-0.001$ & $-0.397$ & $+0.396$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Robustness: Digitization Error and Selection Optimism}\label{sec:robustnessresults}
+
+\textbf{Digitization precision is high and does not limit the conclusions.} Across 60 digitized points whose true $x$-values are stated in the source text, reading error averages 0.19\% of the axis span, with a 95th percentile of 0.41\% and a maximum of 0.45\%. Injecting Gaussian noise at that measured level leaves performance unchanged ($R^{2}=0.496$ for $A$ against an unperturbed 0.495; $0.337$ for $g_s$ against 0.314). Performance degrades only slowly thereafter: at 5\% noise -- more than ten times the measured error -- $R^{2}$ for $A$ is still 0.447, and at 10\% noise, roughly twenty-five times the measured error, it remains 0.375. Digitization quality is therefore not a material threat to these results.
+
+\textbf{Selection optimism is present but modest, and the architecture survives blind reselection.} Nested cross-validation gives unbiased estimates of $R^{2}=0.428\pm0.644$ for $A$ and $0.173\pm0.573$ for $g_s$, against standard estimates of $0.495$ and $0.314$ computed identically but without nesting. The implied selection optimism is therefore $+0.07$ for $A$ and $+0.14$ for $g_s$: real, larger for the noisier target, and small enough that both nested estimates remain positive. Readers should discount the headline values in Table~\ref{tab:perf} by approximately this much. Notably, the inner selection loop -- which has no knowledge of our modelling choices -- independently selected the physics-informed ridge architecture in the majority of outer folds (28 of 47 for $A$, 26 of 46 for $g_s$, with the remainder split across XGBoost variants and other ridge penalties), indicating that the architecture was not an artifact of our search.
+
+\textbf{Imputed values do not inflate performance; they dilute it.} Within the same model, out-of-fold prediction is markedly \emph{worse} on the 59 regression-estimated rows ($R^{2}=0.03$ for $A$, $0.03$ for $g_s$) than on the 106 measured rows ($0.81$ and $0.54$). The imputation therefore adds variance the model cannot fit rather than manufacturing artificial predictability, which is the failure mode that would have been disqualifying. Refitting on measured rows only does lower performance for $A$ ($R^{2}=-0.31$), but this is attributable to experimental coverage rather than to imputation: every drought measurement in the dataset is an imputed row, so the measured-only subset is well-watered exclusively and the drought indicator becomes constant. A sample-size-matched random subset that retains drought coverage scores $+0.42$, against $-0.31$ for the drought-free measured subset. The honest reading is that the $A$ model depends on having more than one water treatment represented, not that it depends on imputed values.
+
+\textbf{Conclusions do not depend on the chosen functional form.} Substituting an exponential or hyperbolic saturation term for the Michaelis--Menten form changes $R^{2}$ by less than 0.03 ($A$: 0.493, 0.517, 0.517; $g_s$: 0.340, 0.346, 0.345). The alternatives are in fact marginally better, so the Michaelis--Menten form was not selected for performance; it was chosen as the standard description of light-limited assimilation, and the choice is immaterial to the result.
+
+\textbf{Digitized values are physiologically plausible.} No source paper states absolute assimilation or conductance values numerically, so the $y$-axis cannot be validated against stated values as the $x$-axis was. As a substitute check, all 165 rows fall within established ranges for C3 rice: assimilation at saturating light spans 9.9--30.4\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ (lower values from severe knockouts), conductance 0.035--0.494\,mol\,m$^{-2}$\,s$^{-1}$, and median intrinsic water-use efficiency 72\,$\mu$mol\,mol$^{-1}$; assimilation at PPFD $\le100$ is 1.7--4.7, correctly light-limited. No row lies outside physiologically plausible bounds.
+
+\textbf{The signal is not manufactured by the selection procedure.} Running the identical pipeline against permuted targets yields a null distribution centred near zero (mean $R^{2}=-0.11$ for $A$, $-0.09$ for $g_s$) whose 95th percentile is approximately $0.00$ for both. No permutation of 30 reached the observed performance for either target ($p<0.001$).
+
 \subsection{The Carbon--Water Trade-off}\label{sec:tradeoff}
 
 Because $\beta_{g_s}\gg\beta_{A}$, reducing stomatal density costs proportionally less carbon than the water it saves. Within the validated domain (growth-chamber conditions, PPFD 1500\,$\mu$mol\,m$^{-2}$\,s$^{-1}$, VPD 1.6\,kPa, $29\,^{\circ}$C), the model predicts:
@@ -313,39 +361,6 @@ Two caveats prevent reading this as a pure severity effect. First, severity is p
 
 The practical consequence is that the trade-off curves in Figure~\ref{fig:tradeoff} should be read with declining confidence as reduction increases, and we regard predictions above roughly 30\% reduction as illustrative rather than validated -- a bound set by where genotype-level validation still succeeds, and which coincides with where the data become sparse (Section~\ref{sec:gap}). More genotypes spanning both the 30--70\% band and the severe tail would be needed to validate that region.
 
-\subsection{Robustness: Digitization Error and Selection Optimism}\label{sec:robustnessresults}
-
-\textbf{Digitization precision is high and does not limit the conclusions.} Across 60 digitized points whose true $x$-values are stated in the source text, reading error averages 0.19\% of the axis span, with a 95th percentile of 0.41\% and a maximum of 0.45\%. Injecting Gaussian noise at that measured level leaves performance unchanged ($R^{2}=0.496$ for $A$ against an unperturbed 0.495; $0.337$ for $g_s$ against 0.314). Performance degrades only slowly thereafter: at 5\% noise -- more than ten times the measured error -- $R^{2}$ for $A$ is still 0.447, and at 10\% noise, roughly twenty-five times the measured error, it remains 0.375. Digitization quality is therefore not a material threat to these results.
-
-\textbf{Selection optimism is present but modest, and the architecture survives blind reselection.} Nested cross-validation gives unbiased estimates of $R^{2}=0.428\pm0.644$ for $A$ and $0.173\pm0.573$ for $g_s$, against standard estimates of $0.495$ and $0.314$ computed identically but without nesting. The implied selection optimism is therefore $+0.07$ for $A$ and $+0.14$ for $g_s$: real, larger for the noisier target, and small enough that both nested estimates remain positive. Readers should discount the headline values in Table~\ref{tab:perf} by approximately this much. Notably, the inner selection loop -- which has no knowledge of our modelling choices -- independently selected the physics-informed ridge architecture in the majority of outer folds (28 of 47 for $A$, 26 of 46 for $g_s$, with the remainder split across XGBoost variants and other ridge penalties), indicating that the architecture was not an artifact of our search.
-
-\textbf{Imputed values do not inflate performance; they dilute it.} Within the same model, out-of-fold prediction is markedly \emph{worse} on the 59 regression-estimated rows ($R^{2}=0.03$ for $A$, $0.03$ for $g_s$) than on the 106 measured rows ($0.81$ and $0.54$). The imputation therefore adds variance the model cannot fit rather than manufacturing artificial predictability, which is the failure mode that would have been disqualifying. Refitting on measured rows only does lower performance for $A$ ($R^{2}=-0.31$), but this is attributable to experimental coverage rather than to imputation: every drought measurement in the dataset is an imputed row, so the measured-only subset is well-watered exclusively and the drought indicator becomes constant. A sample-size-matched random subset that retains drought coverage scores $+0.42$, against $-0.31$ for the drought-free measured subset. The honest reading is that the $A$ model depends on having more than one water treatment represented, not that it depends on imputed values.
-
-\textbf{Conclusions do not depend on the chosen functional form.} Substituting an exponential or hyperbolic saturation term for the Michaelis--Menten form changes $R^{2}$ by less than 0.03 ($A$: 0.493, 0.517, 0.517; $g_s$: 0.340, 0.346, 0.345). The alternatives are in fact marginally better, so the Michaelis--Menten form was not selected for performance; it was chosen as the standard description of light-limited assimilation, and the choice is immaterial to the result.
-
-\textbf{Digitized values are physiologically plausible.} No source paper states absolute assimilation or conductance values numerically, so the $y$-axis cannot be validated against stated values as the $x$-axis was. As a substitute check, all 165 rows fall within established ranges for C3 rice: assimilation at saturating light spans 9.9--30.4\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ (lower values from severe knockouts), conductance 0.035--0.494\,mol\,m$^{-2}$\,s$^{-1}$, and median intrinsic water-use efficiency 72\,$\mu$mol\,mol$^{-1}$; assimilation at PPFD $\le100$ is 1.7--4.7, correctly light-limited. No row lies outside physiologically plausible bounds.
-
-\textbf{The signal is not manufactured by the selection procedure.} Running the identical pipeline against permuted targets yields a null distribution centred near zero (mean $R^{2}=-0.11$ for $A$, $-0.09$ for $g_s$) whose 95th percentile is approximately $0.00$ for both. No permutation of 30 reached the observed performance for either target ($p<0.001$).
-
-\subsection{Validation Design and Leakage}\label{sec:leakage}
-
-Validation design materially affects reported performance on data of this structure, and we quantify the effect directly. Holding model, target, features and fold count fixed and varying only whether folds respect genotype boundaries, shuffled 5-fold cross-validation inflates $R^{2}$ relative to genotype-grouped cross-validation by $+0.222$ for $A$ ($0.686$ versus $0.464$), $+0.177$ for $g_s$ ($0.491$ versus $0.314$) and $+0.396$ for $A/g_s$ ($-0.001$ versus $-0.397$), averaged over 20 randomized fold assignments (Table~\ref{tab:leakage}). With 14 genotype lines contributing 165 measurements, replicate rows are near-duplicates, so a shuffled split largely measures interpolation between replicates of a genotype the model has already seen rather than generalization to a new genotype. The inflation is largest for the ratio target, which has the least real signal to dilute it. All performance figures reported in this paper are genotype-grouped.
-
-\begin{table}[t]
-\caption{Leakage from shuffled cross-validation. Identical model, features and fold count; only the fold-assignment rule differs. Mean over 20 randomized assignments.}\label{tab:leakage}
-\centering
-\small
-\begin{tabular}{lccc}
-\toprule
-\textbf{Target} & \textbf{Shuffled 5-fold $R^{2}$} & \textbf{Genotype-grouped $R^{2}$} & \textbf{Inflation} \\
-\midrule
-$A$ (assimilation) & $+0.686$ & $+0.464$ & $+0.222$ \\
-$g_s$ (conductance) & $+0.491$ & $+0.314$ & $+0.177$ \\
-$A/g_s$ (intrinsic WUE) & $-0.001$ & $-0.397$ & $+0.396$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 % ============================================================
 \section{Discussion}\label{sec:discussion}
 
@@ -355,8 +370,8 @@ A physics-informed model combining a saturating light-response prior with a ridg
 \subsection{Target Selection Is a Modelling Decision}
 The most consequential decision in this work was not architectural but the choice of dependent variable. Intrinsic water-use efficiency is the quantity of primary agronomic interest and the natural target, yet it is unlearnable from data of this kind: its ICC-corrected ceiling is $R^{2}=0.00$, and its between-genotype signal is 2.7$\times$ smaller than replicate scatter. Modelling its two constituents separately -- each with a far higher ceiling -- and reporting the trade-off between them recovers a usable framework. We recommend computing Eq.~\ref{eq:ceiling} for any candidate target before model development, particularly where the target is a ratio, index or other derived quantity, since it costs nothing and bounds what any subsequent effort can achieve; we also recommend using the ANOVA ICC rather than a naive sum-of-squares ratio whenever any replicate group may contain a single observation, since that case is common in small biological datasets and the naive estimator is biased upward exactly then.
 
-\subsection{Model Class in the Small-Sample Regime}
-Gradient-boosted trees underperformed ridge regression on every comparison here, often substantially and always with much greater variance. This is a structural consequence of grouped validation: when each genotype contributes a distinct value of the principal continuous predictor, holding one out requires interpolation across that predictor, which piecewise-constant ensembles cannot do. Flexible learners are not automatically preferable where the grouping structure of the data forces interpolation rather than recall.
+\subsection{Model Class Should Follow From Grouping Structure}
+Gradient-boosted trees underperformed ridge regression on every comparison here, often substantially and always with much greater variance (Table~\ref{tab:perf}), for the structural reason given in Section~\ref{sec:model}. The generalizable point is that the appropriate model class is dictated less by sample size than by what the grouping structure asks the model to do. Where groups are defined by distinct values of the principal continuous predictor -- as they are whenever genotypes are distinguished by the very trait being engineered -- held-out prediction is an interpolation problem, and a learner that fits piecewise-constant functions of that predictor cannot solve it however much data it is given. Practitioners in this setting often reach for flexible ensembles on the reasoning that biological responses are nonlinear; our results suggest checking first whether the validation design makes smoothness in the grouping variable a hard requirement rather than a stylistic preference. Notably, the nested selection loop reached the same conclusion independently, choosing a ridge residual in the majority of outer folds (Section~\ref{sec:robustnessresults}).
 
 \subsection{Limitations}\label{sec:limitations}
 \begin{enumerate}

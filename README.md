@@ -97,9 +97,10 @@ data/
 outputs/tables/               # all result tables (CSV/JSON)
 outputs/figures/              # all generated figures
 paper/
-  main.tex                    # manuscript (Springer Nature sn-jnl class)
-  main_llncs_render.tex       # locally-compilable rendering (identical content)
-  LeafLens_paper.pdf          # compiled PDF
+  main.tex                    # SUBMISSION source (Springer Nature sn-jnl class)
+  LeafLens_paper.pdf          # compiled in the real sn-jnl Springer format
+  main_llncs_render.tex       # fallback for previewing without the proprietary class
+  LeafLens_paper_llncs_preview.pdf
 papers/                       # source publications (PDFs)
 PROJECT_NOTES.md              # full methodology, corrections log, and rationale
 ```
@@ -130,6 +131,27 @@ Sources: Caine et al. 2019 (New Phytologist, [10.1111/nph.15344](https://doi.org
 Karavolias et al. 2023 (Plant Physiology, [10.1093/plphys/kiad183](https://doi.org/10.1093/plphys/kiad183)) ·
 Karavolias et al. 2024 (Plant Biotechnology Journal, [10.1111/pbi.14464](https://doi.org/10.1111/pbi.14464)) ·
 climate from [NASA POWER](https://power.larc.nasa.gov/).
+
+## Compiling the manuscript
+
+`paper/main.tex` targets Springer Nature's `sn-jnl` class, which is not on CTAN and cannot
+be auto-fetched. Get it by opening the **Springer Nature template in the Overleaf gallery**
+and pasting `main.tex` in, or by downloading the template from Springer's LaTeX
+author-support page (v3.1+).
+
+The file has been test-compiled against `sn-jnl` and builds cleanly (21 pp, 0 errors). Three
+things were required and are already applied:
+
+1. `\usepackage{manyfoot}` — the class calls `\SetFootnoteHook`/`\DeclareNewFootnote` in an
+   `\AtBeginDocument` hook without loading the package that defines them.
+2. Comma-separated `\keywords` — `\and` is llncs syntax and collides with the class's
+   author-block tabular (`Misplaced \crcr`).
+3. A numbered bibliography option (`sn-mathphys-num`) — `sn-basic` puts natbib in author-year
+   mode, incompatible with the manual numeric `\thebibliography` used here. Swap in whichever
+   numbered style your target journal specifies; `sn-nature` also builds cleanly.
+
+`main_llncs_render.tex` reproduces identical content in the `llncs` class for previewing
+without the proprietary file.
 
 ## Status
 
