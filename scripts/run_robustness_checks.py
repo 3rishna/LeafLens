@@ -179,6 +179,113 @@ for tgt in TGT:
           f'observed = {obs:+.3f}  p = {p:.3f}')
 results['permutation_test'] = perm
 
+# ------------------------------------------------------------------ (3) imputation
+print('=' * 92)
+print('IMPUTATION SENSITIVITY: do the 59 regression-estimated rows inflate performance?')
+print('=' * 92)
+
+
+def oof_pred(data, groups, tgt, seed, cfg=FINAL_CFG):
+    fold = folds(groups, seed)
+    pred = np.full(len(data), np.nan)
+    for f in range(5):
+        tr, te = data[fold != f], data[fold == f]
+        if len(te) < 3:
+            continue
+        p = fit_predict(tr, te, tgt, cfg)
+        if p is not None:
+            pred[fold == f] = p
+    return pred
+
+
+imp = (df.A_Source == 'estimated_regression').values
+imp_res = {}
+for tgt in TGT:
+    ri, rm = [], []
+    for s in range(20):
+        pr = oof_pred(df, GROUPS, tgt, s)
+        ok = ~np.isnan(pr)
+        ri.append(r2_score(df[TGT[tgt]][ok & imp], pr[ok & imp]))
+        rm.append(r2_score(df[TGT[tgt]][ok & ~imp], pr[ok & ~imp]))
+    # measured-only refit, and an n-matched random subset that retains drought
+    meas = df[~imp].reset_index(drop=True)
+    m_only = np.nanmean([score_config(meas, (meas.Genotype_Line + '_' + meas.Paper_ID).values,
+                                      tgt, FINAL_CFG, s) for s in range(20)])
+    rng = np.random.RandomState(0)
+    matched = []
+    for s in range(20):
+        idx = rng.choice(len(df), (~imp).sum(), replace=False)
+        sub = df.iloc[idx].reset_index(drop=True)
+        matched.append(score_config(sub, (sub.Genotype_Line + '_' + sub.Paper_ID).values,
+                                    tgt, FINAL_CFG, s))
+    imp_res[tgt] = {'oof_R2_on_imputed_rows': round(float(np.mean(ri)), 3),
+                    'oof_R2_on_measured_rows': round(float(np.mean(rm)), 3),
+                    'measured_only_refit_R2': round(float(m_only), 3),
+                    'n_matched_random_subset_R2': round(float(np.nanmean(matched)), 3)}
+    print(f'  {tgt}: out-of-fold R2 on imputed rows = {np.mean(ri):+.3f}   '
+          f'on measured rows = {np.mean(rm):+.3f}')
+    print(f'      measured-only refit = {m_only:+.3f}   n-matched random subset '
+          f'(drought retained) = {np.nanmean(matched):+.3f}')
+results['imputation_sensitivity'] = imp_res
+
+# ------------------------------------------------------------------ (4) functional form
+print('\n' + '=' * 92)
+print('ROBUSTNESS TO THE PHYSICS FUNCTIONAL FORM')
+print('=' * 92)
+
+
+def law_exp(X, ymax, km, beta):
+    ppfd, sd = X
+    return ymax * (1 - np.exp(-ppfd / km)) * (sd ** beta)
+
+
+def law_hyp(X, ymax, km, beta):
+    ppfd, sd = X
+    return ymax * (ppfd / np.sqrt(ppfd ** 2 + km ** 2)) * (sd ** beta)
+
+
+form_res = {}
+for tgt in TGT:
+    form_res[tgt] = {}
+    for nm, fn in [('michaelis_menten_used', law), ('exponential_saturation', law_exp),
+                   ('hyperbolic', law_hyp)]:
+        global_law = fn
+        sc = []
+        for s in range(15):
+            fold = folds(GROUPS, s)
+            f_sc = []
+            for f in range(5):
+                tr, te = df[fold != f], df[fold == f]
+                if len(te) < 3:
+                    continue
+                try:
+                    p, _ = curve_fit(fn, (tr.PPFD_umol.values, tr.SD_ratio.values),
+                                     tr[TGT[tgt]].values, p0=P0[tgt], bounds=BND[tgt], maxfev=20000)
+                except Exception:
+                    continue
+                b_tr = fn((tr.PPFD_umol.values, tr.SD_ratio.values), *p)
+                b_te = fn((te.PPFD_umol.values, te.SD_ratio.values), *p)
+                m = Ridge(alpha=1.0).fit(tr[FEATURE_SETS['full6']], tr[TGT[tgt]].values - b_tr)
+                f_sc.append(r2_score(te[TGT[tgt]], b_te + m.predict(te[FEATURE_SETS['full6']])))
+            if f_sc:
+                sc.append(np.mean(f_sc))
+        form_res[tgt][nm] = round(float(np.mean(sc)), 3)
+        print(f'  {tgt}: {nm:26s} R2 = {np.mean(sc):+.3f}')
+results['functional_form'] = form_res
+
+# ------------------------------------------------------------------ (5) plausibility
+sat = df[df.PPFD_umol >= 1000]
+oob = int(((df.Photosynthetic_Rate_A > 40) | (df.Stomatal_Conductance_gs > 0.8) |
+           (df.WUE_intrinsic > 250)).sum())
+results['physiological_plausibility'] = {
+    'A_at_saturating_light': [round(float(sat.Photosynthetic_Rate_A.min()), 1),
+                              round(float(sat.Photosynthetic_Rate_A.max()), 1)],
+    'gs_range': [round(float(df.Stomatal_Conductance_gs.min()), 3),
+                 round(float(df.Stomatal_Conductance_gs.max()), 3)],
+    'iWUE_median': round(float(df.WUE_intrinsic.median()), 1),
+    'rows_outside_plausible_bounds': oob}
+print(f'\nPhysiological plausibility: {oob}/{len(df)} rows outside plausible bounds')
+
 with open('outputs/tables/robustness_checks.json', 'w') as f:
     json.dump(results, f, indent=2)
-print('\nSaved to outputs/tables/robustness_checks.json')
+print('Saved to outputs/tables/robustness_checks.json')

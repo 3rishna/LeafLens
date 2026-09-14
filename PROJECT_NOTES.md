@@ -281,6 +281,32 @@ remain positive. Two supporting observations:
   R² ≈ −0.10 with a 95th percentile of ≈ 0.00. No permutation of 30 approached the observed
   performance for either target, p < 0.001.
 
+### Three further commitments tested
+
+**Do the 59 imputed rows inflate results?** No — the opposite. Within the same model,
+out-of-fold prediction is markedly *worse* on imputed rows (R² = 0.03 for both targets)
+than on measured rows (0.81 for A, 0.54 for gs). Imputation adds variance the model cannot
+fit rather than manufacturing predictability, which is the failure mode that would have
+been disqualifying.
+
+Refitting on measured rows only *does* drop A to R² = −0.31, but that is a **coverage**
+effect, not an imputation effect: every drought measurement in the dataset is an imputed
+row, so the measured-only subset is well-watered exclusively and `Is_Drought` goes constant.
+A sample-size-matched random subset that retains drought scores +0.42. The real constraint
+is that drought coverage and imputation are entangled and cannot be separated in this data.
+
+**Does the physics functional form matter?** No. Swapping Michaelis–Menten for exponential
+or hyperbolic saturation moves R² by < 0.03 (A: 0.493 / 0.517 / 0.517; gs: 0.340 / 0.346 /
+0.345). The alternatives are marginally *better*, so MM was not chosen for performance — it
+was chosen as the standard description of light-limited assimilation, and the choice is
+immaterial.
+
+**Are the digitized y-values credible?** No source paper states absolute A or gs numerically,
+so the x-axis trick cannot be repeated for the y-axis — a genuine dead end. As a substitute,
+all 165 rows sit inside established C3 rice ranges: A at saturation 9.9–30.4 µmol m⁻² s⁻¹,
+gs 0.035–0.494 mol m⁻² s⁻¹, median iWUE 72 µmol mol⁻¹, and A at PPFD ≤ 100 is 1.7–4.7
+(correctly light-limited). 0/165 rows outside plausible bounds.
+
 Not nested: the choice of *target* (A and gs rather than A/gs), because R² is not comparable
 across different response variables. That decision rests on the variance-ceiling analysis,
 which is computed from replicate structure alone without fitting a model and so consumes no

@@ -38,5 +38,43 @@
       "observed_R2": 0.314,
       "p_value": 0.0
     }
+  },
+  "imputation_sensitivity": {
+    "A": {
+      "oof_R2_on_imputed_rows": 0.029,
+      "oof_R2_on_measured_rows": 0.812,
+      "measured_only_refit_R2": -0.314,
+      "n_matched_random_subset_R2": 0.421
+    },
+    "gs": {
+      "oof_R2_on_imputed_rows": 0.026,
+      "oof_R2_on_measured_rows": 0.539,
+      "measured_only_refit_R2": 0.235,
+      "n_matched_random_subset_R2": 0.269
+    }
+  },
+  "functional_form": {
+    "A": {
+      "michaelis_menten_used": 0.493,
+      "exponential_saturation": 0.517,
+      "hyperbolic": 0.517
+    },
+    "gs": {
+      "michaelis_menten_used": 0.34,
+      "exponential_saturation": 0.346,
+      "hyperbolic": 0.345
+    }
+  },
+  "physiological_plausibility": {
+    "A_at_saturating_light": [
+      9.9,
+      30.4
+    ],
+    "gs_range": [
+      0.035,
+      0.494
+    ],
+    "iWUE_median": 71.6,
+    "rows_outside_plausible_bounds": 0
   }
 }

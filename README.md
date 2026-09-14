@@ -42,7 +42,10 @@ selection inside the validation loop) puts selection-corrected performance at **
 (`A`) and **0.17** (`g_s`); a permutation test rejects the null at **p < 0.001** for both;
 and measured digitization error (0.41% of axis span) does not affect results until ~25× that
 level. The inner selection loop independently rediscovers the physics-informed ridge
-architecture in most folds.
+architecture in most folds. Three further checks: the 59 imputed rows do **not** inflate
+results (the model predicts them *worse* than measured rows, 0.03 vs 0.81); the physics
+functional form is immaterial (< 0.03 R² across three saturating forms); and all 165 rows
+fall within established physiological ranges for C3 rice.
 
 Within the validated domain, a **30% stomatal-density reduction** is predicted to retain
 **94.9%** of wild-type assimilation while reducing conductance to **92.0%** — water loss
