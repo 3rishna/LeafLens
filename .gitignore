@@ -31,18 +31,11 @@ Thumbs.db
 # Streamlit Local Cache
 .streamlit/
 
-# Build artifacts
+# Superseded build artifact (replaced by LeafLens_overleaf.zip)
 leaflens_paper.zip
-paper/*.aux
-paper/*.log
-paper/*.out
 
-# Springer proprietary class - obtain from Overleaf/Springer, do not redistribute
-sn-jnl.cls
-paper/sn-jnl.cls
-LeafLens_overleaf.zip
-
-# LaTeX build artifacts
+# LaTeX build artifacts (paper/LeafLens_paper.pdf and LeafLens_overleaf.zip ARE
+# tracked -- they are the compiled deliverables, not intermediate build output)
 *.aux
 *.log
 *.out
@@ -52,7 +45,4 @@ LeafLens_overleaf.zip
 *.fdb_latexmk
 *.bbl
 *.blg
-paper/*.pdf.bak
-
-# Generated packages / archives
-*.zip
+paper/main.pdf

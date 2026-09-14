@@ -97,10 +97,8 @@ data/
 outputs/tables/               # all result tables (CSV/JSON)
 outputs/figures/              # all generated figures
 paper/
-  main.tex                    # SUBMISSION source (Springer Nature sn-jnl class)
-  LeafLens_paper.pdf          # compiled in the real sn-jnl Springer format
-  main_llncs_render.tex       # fallback for previewing without the proprietary class
-  LeafLens_paper_llncs_preview.pdf
+  main.tex                    # manuscript (Springer llncs proceedings class)
+  LeafLens_paper.pdf          # compiled PDF
 papers/                       # source publications (PDFs)
 PROJECT_NOTES.md              # full methodology, corrections log, and rationale
 ```
@@ -134,24 +132,19 @@ climate from [NASA POWER](https://power.larc.nasa.gov/).
 
 ## Compiling the manuscript
 
-`paper/main.tex` targets Springer Nature's `sn-jnl` class, which is not on CTAN and cannot
-be auto-fetched. Get it by opening the **Springer Nature template in the Overleaf gallery**
-and pasting `main.tex` in, or by downloading the template from Springer's LaTeX
-author-support page (v3.1+).
+`paper/main.tex` targets Springer's `llncs` (Lecture Notes in Computer Science) proceedings
+class. Unlike a Springer Nature journal class, `llncs` **is** a standard CTAN/TeX-Live
+package, so Overleaf and any normal LaTeX install supply it automatically — nothing extra
+needs to be downloaded or bundled.
 
-The file has been test-compiled against `sn-jnl` and builds cleanly (21 pp, 0 errors). Three
-things were required and are already applied:
+Test-compiled with `tectonic`: 20 pages, 0 errors. One thing to know: `\ackname`,
+`\discintname` and the `credits` environment used in the acknowledgments/disclosure section
+were only added to `llncs.cls` in v2.25 (2026); if your installed copy predates that, `main.tex`
+carries a small compatibility shim (right after `\documentclass`) that defines them only if
+missing, so the file builds identically either way — do not remove it.
 
-1. `\usepackage{manyfoot}` — the class calls `\SetFootnoteHook`/`\DeclareNewFootnote` in an
-   `\AtBeginDocument` hook without loading the package that defines them.
-2. Comma-separated `\keywords` — `\and` is llncs syntax and collides with the class's
-   author-block tabular (`Misplaced \crcr`).
-3. A numbered bibliography option (`sn-mathphys-num`) — `sn-basic` puts natbib in author-year
-   mode, incompatible with the manual numeric `\thebibliography` used here. Swap in whichever
-   numbered style your target journal specifies; `sn-nature` also builds cleanly.
-
-`main_llncs_render.tex` reproduces identical content in the `llncs` class for previewing
-without the proprietary file.
+`LeafLens_overleaf.zip` (repo root) is a ready-to-upload package: `main.tex` plus the 9
+referenced figures, nothing else. Overleaf → New Project → Upload Project → select it.
 
 ## Status
 
