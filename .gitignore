@@ -40,3 +40,4 @@ paper/*.out
 # Springer proprietary class - obtain from Overleaf/Springer, do not redistribute
 sn-jnl.cls
 paper/sn-jnl.cls
+LeafLens_overleaf.zip
