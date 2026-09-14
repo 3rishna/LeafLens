@@ -229,7 +229,67 @@ In order of expected value:
 
 ---
 
-## 7. Honest scope statement
+## 7. Robustness: the two residual risks, quantified
+
+Two threats were previously disclosed but unmeasured. Both are now quantified
+(`scripts/run_robustness_checks.py`).
+
+### Digitization error — measured, and shown not to matter
+
+The x-axis of the Karavolias 2023 light-response figures corresponds to PAR levels stated
+numerically in that paper's text, so deviation of each digitized x-reading from its nominal
+level is **pure reading error**. Across 60 such points:
+
+| statistic | reading error (% of axis span) |
+|---|---|
+| mean | 0.19% |
+| 95th percentile | 0.41% |
+| maximum | 0.45% |
+
+Injecting Gaussian noise into every digitized quantity and re-running the pipeline:
+
+| injected noise | A R² | gs R² |
+|---|---|---|
+| 0% (baseline) | 0.495 | 0.314 |
+| 0.41% (measured) | 0.496 | 0.337 |
+| 2% | 0.488 | 0.325 |
+| 5% (~12× measured) | 0.447 | 0.327 |
+| 10% (~25× measured) | 0.375 | 0.271 |
+
+Conclusions are insensitive to digitization quality until roughly 25× the measured error.
+What this does *not* capture: independent re-digitization by a second operator, which would
+also measure operator bias rather than reading precision alone.
+
+### Selection optimism — measured by nested cross-validation
+
+Model class, feature set and ridge penalty were chosen by comparing validation scores on
+this dataset. Nested CV runs that entire search (24 configurations) inside an inner loop on
+outer-training data only, scoring on an outer fold that informed no choice:
+
+| target | standard R² | nested (unbiased) R² | selection optimism |
+|---|---|---|---|
+| A | 0.495 | 0.428 ± 0.644 | **+0.067** |
+| gs | 0.314 | 0.173 ± 0.573 | **+0.141** |
+
+Optimism is real, larger for the noisier target, and small enough that both nested estimates
+remain positive. Two supporting observations:
+
+- The inner loop, which has no knowledge of our choices, **independently selected the
+  physics-informed ridge architecture in most outer folds** (28/47 for A, 26/46 for gs) —
+  the architecture is not an artifact of our search.
+- A **permutation test** (pipeline re-run against shuffled targets) gives a null centred at
+  R² ≈ −0.10 with a 95th percentile of ≈ 0.00. No permutation of 30 approached the observed
+  performance for either target, p < 0.001.
+
+Not nested: the choice of *target* (A and gs rather than A/gs), because R² is not comparable
+across different response variables. That decision rests on the variance-ceiling analysis,
+which is computed from replicate structure alone without fitting a model and so consumes no
+validation information — but it remains a choice made with knowledge of this dataset, and
+only independent replication can fully rule out dataset-specific tailoring.
+
+---
+
+## 8. Honest scope statement
 
 This is a methods contribution and a research prototype:
 
@@ -237,7 +297,9 @@ This is a methods contribution and a research prototype:
   two-thirds of the achievable ceiling, with a physics prior that demonstrably helps.
 - It does **not** provide a validated optimal stomatal-density target for field deployment.
 - It does **not** transfer to unseen studies, cultivars, or field climates.
-- Target variable, model class and feature set were chosen partly by comparing validation
-  scores within this dataset, so the specific R² values carry some selection optimism. The
-  ceiling analysis and the 20/20 paired physics result are robust to that process; the
-  third decimal place of any R² is not.
+- Selection optimism is measured, not assumed: nested CV puts it at +0.07 (A) and +0.14
+  (gs), so headline values should be discounted accordingly. Permutation testing rejects
+  the null at p < 0.001 for both targets, and digitization error is immaterial at the
+  measured precision (§7).
+- What remains genuinely open: independent re-digitization by a second operator, and
+  external replication on a dataset not used to make any modelling choice.

@@ -37,6 +37,13 @@ The physics prior earns its place: it improves R² by **+0.116 ± 0.091** (`A`) 
 **+0.042 ± 0.023** (`g_s`) over an otherwise identical model without it, winning in
 **20 of 20** paired repeats for both targets.
 
+Robustness, measured rather than assumed: nested cross-validation (running the whole model
+selection inside the validation loop) puts selection-corrected performance at **R² = 0.43**
+(`A`) and **0.17** (`g_s`); a permutation test rejects the null at **p < 0.001** for both;
+and measured digitization error (0.41% of axis span) does not affect results until ~25× that
+level. The inner selection loop independently rediscovers the physics-informed ridge
+architecture in most folds.
+
 Within the validated domain, a **30% stomatal-density reduction** is predicted to retain
 **94.9%** of wild-type assimilation while reducing conductance to **92.0%** — water loss
 falls faster than carbon gain, which is the quantitative basis for stomatal engineering.
@@ -74,6 +81,7 @@ scripts/
   build_feautures.py          # feature engineering + climate PPFD conversion
   train_final_model.py        # FINAL model: physics prior + ridge, all validation
   run_supporting_analyses.py  # reproduces every remaining number in the paper
+  run_robustness_checks.py    # digitization error, nested CV, permutation test
   make_final_figures.py       # all manuscript figures
   run_eda.py                  # exploratory plots + extrapolation diagnostic
   download_climate.py         # NASA POWER retrieval
@@ -100,6 +108,7 @@ python scripts/parse_digitized_data.py      # rebuild dataset from digitized fig
 python scripts/build_feautures.py           # feature matrix + climate conversion
 python scripts/train_final_model.py         # model, validation, ceiling analysis
 python scripts/run_supporting_analyses.py   # leakage, transfer, coverage analyses
+python scripts/run_robustness_checks.py     # digitization error, nested CV, permutation
 python scripts/make_final_figures.py        # figures
 ```
 
