@@ -1,4 +1,4 @@
 Model_Architecture,Test_R2,CV_5Fold_Mean_R2,CV_5Fold_Std_R2,LOSO_Mean_R2
 Pure Physics Baseline (no ML),-8.913,,,
-"Naive ML (XGBoost, no physics prior)",-0.021,0.005,0.069,
-Physics-Informed Hybrid XGBoost (LeafLens),-0.019,-0.118,0.131,-1.951
+"Naive ML (XGBoost, no physics prior)",-0.026,0.035,0.046,
+Physics-Informed Hybrid XGBoost (LeafLens),-0.007,-0.155,0.173,-1.812
